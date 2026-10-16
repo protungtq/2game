@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StoreHeader } from './StoreHeader';
 import { StoreHero } from './StoreHero';
 import { StoreCatalog } from './StoreCatalog';
@@ -8,6 +8,8 @@ import { FloatingSupport } from './FloatingSupport';
 import { StoreFooter } from './StoreFooter';
 
 import { STORE_GAMES } from '../data/mockStoreData';
+import { supabase } from '../lib/supabase';
+import { mapProductToStoreGame } from '../lib/mapProduct';
 import { CheckCircle2, Send } from 'lucide-react';
 
 export const TELEGRAM_USERNAME = 'girl2vn';
@@ -35,6 +37,36 @@ export default function StoreApp() {
 
   const [toastMessage, setToastMessage] = useState(null);
 
+  // Products: Supabase first, fallback to mock data
+  const [games, setGames] = useState([]);
+  const [loadingGames, setLoadingGames] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadProducts() {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false });
+        if (cancelled) return;
+        if (!error && data && data.length > 0) {
+          setGames(data.map(mapProductToStoreGame));
+        } else {
+          setGames(STORE_GAMES);
+        }
+      } catch (e) {
+        if (!cancelled) setGames(STORE_GAMES);
+      } finally {
+        if (!cancelled) setLoadingGames(false);
+      }
+    }
+    loadProducts();
+    return () => { cancelled = true; };
+  }, []);
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -52,12 +84,13 @@ export default function StoreApp() {
     }
   };
 
-  const wishlistGames = STORE_GAMES.filter(g => wishlistIds.includes(g.id));
-  const hotDeals = STORE_GAMES.filter(g => g.isHotDeal);
+  const wishlistGames = games.filter(g => wishlistIds.includes(g.id));
+  const hotDeals = games.filter(g => g.isHotDeal);
+  const heroGames = hotDeals.length >= 3 ? hotDeals : games.slice(0, 3);
 
   const filteredSearchGames = searchQuery
-    ? STORE_GAMES.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()) || g.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())))
-    : STORE_GAMES;
+    ? games.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()) || g.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())))
+    : games;
 
   return (
     <div className="min-h-screen bg-[#0b0d12] text-neutral-100 flex flex-col font-sans selection:bg-purple-600 selection:text-white">
@@ -79,7 +112,12 @@ export default function StoreApp() {
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {searchQuery ? (
+        {loadingGames ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-4">
+            <div className="w-10 h-10 border-4 border-purple-600/30 border-t-purple-500 rounded-full animate-spin" />
+            <p className="text-sm text-neutral-400">Đang tải game...</p>
+          </div>
+        ) : searchQuery ? (
           <div className="space-y-6">
             <div className="border-b border-neutral-800 pb-3 flex items-center justify-between">
               <h2 className="text-xl font-black text-white">
@@ -101,14 +139,14 @@ export default function StoreApp() {
             {activeTab === 'store' && (
               <div className="space-y-12">
                 <StoreHero
-                  hotDeals={hotDeals}
+                  hotDeals={heroGames}
                   onSelectGame={(g) => setSelectedGame(g)}
                   onOrderTelegram={openTelegramOrder}
                 />
 
                 <div className="border-t border-neutral-800/80 pt-10">
                   <StoreCatalog
-                    games={STORE_GAMES}
+                    games={games}
                     onSelectGame={(g) => setSelectedGame(g)}
                     onOrderTelegram={openTelegramOrder}
                     wishlistIds={wishlistIds}
