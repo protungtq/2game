@@ -1,0 +1,6 @@
+{
+  "name": "2Game Vietnam Portal",
+  "description": "Cổng thông tin game, giftcode, tin tức và đánh giá game số 1 tại Việt Nam.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
