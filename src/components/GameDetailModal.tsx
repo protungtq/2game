@@ -1,11 +1,11 @@
 import React from 'react';
-import { ShoppingCart, Heart, Star, ShieldCheck, Cpu, HardDrive, Monitor, CheckCircle2 } from 'lucide-react';
+import { Send, Heart, Star, ShieldCheck, Cpu, HardDrive, Monitor, CheckCircle2 } from 'lucide-react';
 import { StoreGame } from '../types';
 
 interface GameDetailModalProps {
   game: StoreGame;
   onClose: () => void;
-  onAddToCart: (game: StoreGame) => void;
+  onOrderTelegram: (game: StoreGame) => void;
   isWishlisted: boolean;
   onToggleWishlist: (id: string) => void;
 }
@@ -13,7 +13,7 @@ interface GameDetailModalProps {
 export const GameDetailModal: React.FC<GameDetailModalProps> = ({
   game,
   onClose,
-  onAddToCart,
+  onOrderTelegram,
   isWishlisted,
   onToggleWishlist
 }) => {
@@ -31,6 +31,11 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
             <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-md uppercase">
               {game.drm} Key
             </span>
+            {!game.inStock && (
+              <span className="bg-neutral-800 border border-neutral-700 text-neutral-300 text-xs font-bold px-3 py-1 rounded-md uppercase">
+                Hết hàng
+              </span>
+            )}
             <span className="text-xs text-emerald-400 flex items-center gap-1 font-semibold">
               <ShieldCheck className="w-4 h-4" /> Chính hãng 100%
             </span>
@@ -66,7 +71,7 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               <img
                 src={game.coverImage}
                 alt={game.title}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover ${!game.inStock ? 'grayscale opacity-70' : ''}`}
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -87,8 +92,12 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
                 </h1>
 
                 <div className="flex items-center gap-4 text-xs text-neutral-400">
-                  <span>Phát hành: <strong className="text-neutral-200">{game.publisher}</strong></span>
-                  <span>•</span>
+                  {game.publisher && (
+                    <>
+                      <span>Phát hành: <strong className="text-neutral-200">{game.publisher}</strong></span>
+                      <span>•</span>
+                    </>
+                  )}
                   <span className="flex items-center gap-1 text-amber-400 font-bold">
                     <Star className="w-4 h-4 fill-amber-400" /> {game.rating} / 5.0
                   </span>
@@ -103,12 +112,16 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
               <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-4 flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-red-500 bg-red-950/80 px-2 py-0.5 rounded">
-                      -{game.discountPercentage}%
-                    </span>
-                    <span className="text-xs text-neutral-500 line-through">
-                      {formatVND(game.originalPrice)}
-                    </span>
+                    {game.discountPercentage > 0 && (
+                      <>
+                        <span className="text-xs font-bold text-red-500 bg-red-950/80 px-2 py-0.5 rounded">
+                          -{game.discountPercentage}%
+                        </span>
+                        <span className="text-xs text-neutral-500 line-through">
+                          {formatVND(game.originalPrice)}
+                        </span>
+                      </>
+                    )}
                   </div>
                   <span className="text-2xl font-black text-white">
                     {formatVND(game.price)}
@@ -117,12 +130,16 @@ export const GameDetailModal: React.FC<GameDetailModalProps> = ({
 
                 <button
                   onClick={() => {
-                    onAddToCart(game);
+                    onOrderTelegram(game);
                     onClose();
                   }}
-                  className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl shadow-lg shadow-red-600/30 flex items-center gap-2 transition-transform active:scale-95"
+                  className={`px-6 py-3 text-white font-black text-xs rounded-xl shadow-lg flex items-center gap-2 transition-transform active:scale-95 ${
+                    game.inStock
+                      ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-600/30'
+                      : 'bg-neutral-700 hover:bg-neutral-600'
+                  }`}
                 >
-                  <ShoppingCart className="w-4 h-4" /> Thêm Vào Giỏ Hàng
+                  <Send className="w-4 h-4" /> {game.inStock ? 'Đặt mua qua Telegram' : 'Hỏi hàng qua Telegram'}
                 </button>
               </div>
             </div>
