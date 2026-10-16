@@ -1,14 +1,14 @@
 import React from 'react';
 import { StoreGame } from '../types';
+import { Send } from 'lucide-react';
 
 interface StoreHeroProps {
   hotDeals: StoreGame[];
   onSelectGame: (game: StoreGame) => void;
-  onAddToCart: (game: StoreGame) => void;
-  onOpenTelegram: () => void;
+  onOrderTelegram: (game: StoreGame) => void;
 }
 
-export const StoreHero: React.FC<StoreHeroProps> = ({ hotDeals, onSelectGame, onOpenTelegram }) => {
+export const StoreHero: React.FC<StoreHeroProps> = ({ hotDeals, onSelectGame, onOrderTelegram }) => {
   if (hotDeals.length < 3) return null;
 
   const mainHero = hotDeals[0];
@@ -45,11 +45,11 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hotDeals, onSelectGame, on
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onOpenTelegram();
+                onOrderTelegram(mainHero);
               }}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg transition-transform active:scale-95"
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg transition-transform active:scale-95 flex items-center gap-2"
             >
-              Mua Ngay (Nhắn Telegram)
+              <Send className="w-4 h-4" /> Đặt mua qua Telegram
             </button>
           </div>
         </div>
