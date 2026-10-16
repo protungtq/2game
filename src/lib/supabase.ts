@@ -18,6 +18,13 @@ export interface Product {
   stock: number;
   is_active: boolean;
   is_featured: boolean;
+  publisher: string | null;
+  rating: number | null;
+  os: string | null;
+  cpu: string | null;
+  ram: string | null;
+  gpu: string | null;
+  storage: string | null;
   created_at: string;
   updated_at: string;
 }

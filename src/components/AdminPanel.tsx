@@ -32,12 +32,21 @@ interface FormState {
   stock: string;
   is_active: boolean;
   is_featured: boolean;
+  publisher: string;
+  rating: string;
+  os: string;
+  cpu: string;
+  ram: string;
+  gpu: string;
+  storage: string;
 }
 
 const emptyForm: FormState = {
   name: '', slug: '', price: '', original_price: '',
   description: '', genre: '', image_url: '', steam_appid: '',
   stock: '0', is_active: true, is_featured: false,
+  publisher: '', rating: '4.5',
+  os: 'Windows 10 64-bit', cpu: '', ram: '', gpu: '', storage: '',
 };
 
 export default function AdminPanel() {
@@ -133,6 +142,13 @@ export default function AdminPanel() {
       stock: String(p.stock),
       is_active: p.is_active,
       is_featured: p.is_featured,
+      publisher: p.publisher || '',
+      rating: p.rating != null ? String(p.rating) : '4.5',
+      os: p.os || 'Windows 10 64-bit',
+      cpu: p.cpu || '',
+      ram: p.ram || '',
+      gpu: p.gpu || '',
+      storage: p.storage || '',
     });
     setFormError('');
     setFormOpen(true);
@@ -158,6 +174,8 @@ export default function AdminPanel() {
     if (originalPrice != null && (isNaN(originalPrice) || originalPrice < 0)) { setFormError('Giá gốc không hợp lệ.'); return; }
     const stock = parseInt(form.stock, 10);
     if (isNaN(stock) || stock < 0) { setFormError('Tồn kho không hợp lệ.'); return; }
+    const rating = parseFloat(form.rating);
+    if (form.rating.trim() !== '' && (isNaN(rating) || rating < 0 || rating > 5)) { setFormError('Đánh giá phải từ 0 đến 5.'); return; }
 
     setFormBusy(true);
     const payload = {
@@ -172,6 +190,13 @@ export default function AdminPanel() {
       stock,
       is_active: form.is_active,
       is_featured: form.is_featured,
+      publisher: form.publisher.trim() || null,
+      rating: form.rating.trim() === '' ? null : rating,
+      os: form.os.trim() || null,
+      cpu: form.cpu.trim() || null,
+      ram: form.ram.trim() || null,
+      gpu: form.gpu.trim() || null,
+      storage: form.storage.trim() || null,
     };
 
     let error;
@@ -446,6 +471,14 @@ export default function AdminPanel() {
                 <label className={labelCls}>Steam App ID</label>
                 <input value={form.steam_appid} onChange={(e) => setForm({ ...form, steam_appid: e.target.value })} className={inputCls} placeholder="1245620" />
               </div>
+              <div>
+                <label className={labelCls}>Nhà phát hành</label>
+                <input value={form.publisher} onChange={(e) => setForm({ ...form, publisher: e.target.value })} className={inputCls} placeholder="FromSoftware" />
+              </div>
+              <div>
+                <label className={labelCls}>Đánh giá (0–5)</label>
+                <input type="number" min="0" max="5" step="0.1" value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })} className={inputCls} placeholder="4.5" />
+              </div>
               <div className="sm:col-span-2">
                 <label className={labelCls}>URL ảnh cover</label>
                 <input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} className={inputCls} placeholder="https://cdn.akamai.steamstatic.com/steam/apps/1245620/header.jpg" />
@@ -467,6 +500,33 @@ export default function AdminPanel() {
                   <input type="checkbox" checked={form.is_featured} onChange={(e) => setForm({ ...form, is_featured: e.target.checked })} className="w-4 h-4 accent-purple-600" />
                   Nổi bật
                 </label>
+              </div>
+            </div>
+
+            {/* Cấu hình hệ thống */}
+            <div className="border-t border-neutral-800/80 pt-5">
+              <h3 className="text-sm font-black text-white mb-4">Cấu hình hệ thống (PC)</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="sm:col-span-2">
+                  <label className={labelCls}>Hệ điều hành (OS)</label>
+                  <input value={form.os} onChange={(e) => setForm({ ...form, os: e.target.value })} className={inputCls} placeholder="Windows 10 64-bit" />
+                </div>
+                <div>
+                  <label className={labelCls}>Bộ xử lý (CPU)</label>
+                  <input value={form.cpu} onChange={(e) => setForm({ ...form, cpu: e.target.value })} className={inputCls} placeholder="Intel Core i5-8400 / AMD Ryzen 3 3300X" />
+                </div>
+                <div>
+                  <label className={labelCls}>Bộ nhớ RAM</label>
+                  <input value={form.ram} onChange={(e) => setForm({ ...form, ram: e.target.value })} className={inputCls} placeholder="12 GB RAM" />
+                </div>
+                <div>
+                  <label className={labelCls}>Đồ họa (GPU)</label>
+                  <input value={form.gpu} onChange={(e) => setForm({ ...form, gpu: e.target.value })} className={inputCls} placeholder="NVIDIA GTX 1060 / AMD RX 580" />
+                </div>
+                <div>
+                  <label className={labelCls}>Dung lượng trống (Storage)</label>
+                  <input value={form.storage} onChange={(e) => setForm({ ...form, storage: e.target.value })} className={inputCls} placeholder="60 GB" />
+                </div>
               </div>
             </div>
 
