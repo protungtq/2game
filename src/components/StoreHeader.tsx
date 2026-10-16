@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Search, Gamepad2, User, Menu, X, Settings } from 'lucide-react';
+import { Search, Gamepad2, Heart, Menu, X } from 'lucide-react';
 
 interface StoreHeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  cartCount: number;
-  onOpenCart: () => void;
+  wishlistCount: number;
+  onOpenWishlist: () => void;
 }
 
 export const StoreHeader: React.FC<StoreHeaderProps> = ({
@@ -15,8 +15,8 @@ export const StoreHeader: React.FC<StoreHeaderProps> = ({
   setActiveTab,
   searchQuery,
   setSearchQuery,
-  cartCount,
-  onOpenCart
+  wishlistCount,
+  onOpenWishlist
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -66,14 +66,7 @@ export const StoreHeader: React.FC<StoreHeaderProps> = ({
             >
               Liên hệ
             </button>
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`hover:text-purple-400 transition-colors whitespace-nowrap shrink-0 flex items-center gap-1 text-amber-400 ${
-                activeTab === 'admin' ? 'font-bold' : ''
-              }`}
-            >
-              <Settings className="w-4 h-4" /> Admin CMS
-            </button>
+
           </nav>
 
           {/* Search and Action Buttons */}
@@ -90,22 +83,14 @@ export const StoreHeader: React.FC<StoreHeaderProps> = ({
             </div>
 
             <button
-              onClick={() => setActiveTab('admin')}
-              className="p-2.5 bg-[#161a23] hover:bg-neutral-800 border border-neutral-700/80 rounded-xl text-neutral-300 transition-colors flex items-center justify-center"
-              title="Tài khoản / Admin"
-            >
-              <User className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={onOpenCart}
+              onClick={onOpenWishlist}
               className="relative p-2.5 bg-[#161a23] hover:bg-neutral-800 border border-neutral-700/80 rounded-xl text-neutral-300 transition-colors flex items-center justify-center"
-              title="Giỏ hàng"
+              title="Danh sách yêu thích"
             >
-              <ShoppingCart className="w-4 h-4" />
-              {cartCount > 0 && (
+              <Heart className="w-4 h-4" />
+              {wishlistCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-purple-600 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow">
-                  {cartCount}
+                  {wishlistCount}
                 </span>
               )}
             </button>
@@ -152,12 +137,7 @@ export const StoreHeader: React.FC<StoreHeaderProps> = ({
           >
             Liên hệ
           </button>
-          <button
-            onClick={() => { setActiveTab('admin'); setMobileMenuOpen(false); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 text-amber-400`}
-          >
-            <Settings className="w-4 h-4" /> Admin CMS
-          </button>
+
         </div>
       )}
     </header>
