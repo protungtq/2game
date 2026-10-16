@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Heart, Star, Tag, ShieldCheck } from 'lucide-react';
+import { Heart, Star, Tag, ShieldCheck, Send } from 'lucide-react';
 import { StoreGame } from '../types';
 
 interface StoreCatalogProps {
   games: StoreGame[];
   onSelectGame: (game: StoreGame) => void;
-  onAddToCart: (game: StoreGame) => void;
-  onOpenTelegram: (gameTitle?: string) => void;
+  onOrderTelegram: (game: StoreGame) => void;
   wishlistIds: string[];
   onToggleWishlist: (id: string) => void;
 }
@@ -14,20 +13,19 @@ interface StoreCatalogProps {
 export const StoreCatalog: React.FC<StoreCatalogProps> = ({
   games,
   onSelectGame,
-  onAddToCart,
-  onOpenTelegram,
+  onOrderTelegram,
   wishlistIds,
   onToggleWishlist
 }) => {
-  const [activeFilterPill, setActiveFilterPill] = useState<string>('Xu hướng');
+  const [activeFilterPill, setActiveFilterPill] = useState<string>('Tất cả');
 
-  const filterPills = ['Xu hướng', 'Dưới đ155.000', 'Dưới đ310.000', 'Capcom'];
+  const filterPills = ['Tất cả', 'Dưới 300K', 'Dưới 700K', 'Bán chạy'];
 
   const filteredGames = games.filter(g => {
-    if (activeFilterPill === 'Dưới đ155.000') return g.price < 155000;
-    if (activeFilterPill === 'Dưới đ310.000') return g.price < 310000;
-    if (activeFilterPill === 'Capcom') return g.genres.includes('Capcom') || g.publisher === 'Capcom';
-    return true; // Xu hướng
+    if (activeFilterPill === 'Dưới 300K') return g.price < 300000;
+    if (activeFilterPill === 'Dưới 700K') return g.price < 700000;
+    if (activeFilterPill === 'Bán chạy') return g.isBestseller;
+    return true; // Tất cả
   });
 
   const formatVND = (price: number) => {
@@ -125,12 +123,12 @@ export const StoreCatalog: React.FC<StoreCatalogProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onOpenTelegram(game.title);
+                    onOrderTelegram(game);
                   }}
-                  className="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow transition-transform active:scale-95"
-                  title="Mua qua Telegram"
+                  className="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow transition-transform active:scale-95 flex items-center gap-1.5"
+                  title="Đặt mua qua Telegram"
                 >
-                  Mua Ngay
+                  <Send className="w-3.5 h-3.5" /> Đặt mua
                 </button>
               </div>
             </div>
