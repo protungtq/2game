@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Trash2, ShoppingCart, Star } from 'lucide-react';
+import { Heart, Trash2, Send, Star } from 'lucide-react';
 import { StoreGame } from '../types';
 
 interface WishlistModalProps {
@@ -7,7 +7,7 @@ interface WishlistModalProps {
   onClose: () => void;
   wishlistGames: StoreGame[];
   onRemoveWishlist: (id: string) => void;
-  onAddToCart: (game: StoreGame) => void;
+  onOrderTelegram: (game: StoreGame) => void;
 }
 
 export const WishlistModal: React.FC<WishlistModalProps> = ({
@@ -15,7 +15,7 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
   onClose,
   wishlistGames,
   onRemoveWishlist,
-  onAddToCart
+  onOrderTelegram
 }) => {
   if (!isOpen) return null;
 
@@ -68,13 +68,12 @@ export const WishlistModal: React.FC<WishlistModalProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
-                        onAddToCart(game);
-                        onRemoveWishlist(game.id);
+                        onOrderTelegram(game);
                       }}
-                      className="p-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl transition-colors shadow"
-                      title="Thêm vào giỏ hàng"
+                      className="p-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl transition-colors shadow"
+                      title="Đặt mua qua Telegram"
                     >
-                      <ShoppingCart className="w-4 h-4" />
+                      <Send className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => onRemoveWishlist(game.id)}
