@@ -74,9 +74,14 @@ export const StoreCatalog: React.FC<StoreCatalogProps> = ({
                   <img
                     src={game.coverImage}
                     alt={game.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${!game.inStock ? 'grayscale opacity-70' : ''}`}
                     referrerPolicy="no-referrer"
                   />
+                  {!game.inStock && (
+                    <span className="absolute top-3 left-3 bg-neutral-950/85 border border-neutral-700 text-neutral-200 text-[11px] font-black px-2.5 py-1 rounded-md uppercase">
+                      Hết hàng
+                    </span>
+                  )}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -107,13 +112,17 @@ export const StoreCatalog: React.FC<StoreCatalogProps> = ({
               {/* Price & Discount Pill matching screenshot */}
               <div className="p-4 pt-0 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span className="bg-rose-600 text-white text-[11px] font-black px-2 py-1 rounded-md shadow">
-                    -{game.discountPercentage}%
-                  </span>
-                  <div>
-                    <span className="block text-[11px] text-neutral-500 line-through">
-                      {formatVND(game.originalPrice)}
+                  {game.discountPercentage > 0 && (
+                    <span className="bg-rose-600 text-white text-[11px] font-black px-2 py-1 rounded-md shadow">
+                      -{game.discountPercentage}%
                     </span>
+                  )}
+                  <div>
+                    {game.discountPercentage > 0 && (
+                      <span className="block text-[11px] text-neutral-500 line-through">
+                        {formatVND(game.originalPrice)}
+                      </span>
+                    )}
                     <span className="text-sm font-black text-white">
                       {formatVND(game.price)}
                     </span>
@@ -125,10 +134,14 @@ export const StoreCatalog: React.FC<StoreCatalogProps> = ({
                     e.stopPropagation();
                     onOrderTelegram(game);
                   }}
-                  className="px-3 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow transition-transform active:scale-95 flex items-center gap-1.5"
-                  title="Đặt mua qua Telegram"
+                  className={`px-3 py-2 text-white text-xs font-bold rounded-xl shadow transition-transform active:scale-95 flex items-center gap-1.5 ${
+                    game.inStock
+                      ? 'bg-purple-600 hover:bg-purple-500'
+                      : 'bg-neutral-700 hover:bg-neutral-600'
+                  }`}
+                  title={game.inStock ? 'Đặt mua qua Telegram' : 'Hỏi hàng qua Telegram'}
                 >
-                  <Send className="w-3.5 h-3.5" /> Đặt mua
+                  <Send className="w-3.5 h-3.5" /> {game.inStock ? 'Đặt mua' : 'Hỏi hàng'}
                 </button>
               </div>
             </div>
